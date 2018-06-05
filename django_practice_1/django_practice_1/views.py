@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 # Use /hello-world URL
 def hello_world(request):
     """Return a 'Hello World' string using HttpResponse"""
+    return HttpResponse('Hello World')
     pass
 
 
@@ -17,6 +18,8 @@ def current_date(request):
 
         i.e: 'Today is 5, January 2018'
     """
+    todays_date = datetime.now()
+    return HttpResponse("Today is {}".format(todays_date.strftime("%d, %B %Y")))
     pass
 
 
@@ -28,6 +31,11 @@ def my_age(request, year, month, day):
 
         i.e: /my-age/1992/1/20 returns 'Your age is 26 years old'
     """
+    todays_date = datetime.now()
+    age = todays_date.year - year
+    
+    return HttpResponse('Your age is {} years old'.format(age))
+    
     pass
 
 
@@ -38,8 +46,23 @@ def next_birthday(request, birthday):
         based on a given string GET parameter that comes in the URL, with the
         format 'YYYY-MM-DD'
     """
-    pass
+    bday =  datetime.strptime(birthday,"%Y-%m-%d")
+    todays_date = datetime.now()
+    
 
+    year = todays_date.year
+    if todays_date.month > bday.month:
+        year = todays_date.year + 1
+    elif  todays_date.month == bday.month:
+        if todays_date.day >= bday.day:
+            year = todays_date.year + 1
+
+    print(year)
+    n_bday = datetime.strptime("{}-{}-{}".format(year,bday.month,bday.day),"%Y-%m-%d")
+    time_tobday = n_bday - todays_date
+    return HttpResponse('Days until next birthday: {}'.format(abs(time_tobday.days)))
+
+    
 
 # Use /profile URL
 def profile(request):
@@ -48,7 +71,9 @@ def profile(request):
         'render' function imported from Django.
         Make sure to replace the values inside the template in the proper places.
     """
-    pass
+    
+    return render(request,"profile.html",{'author':'Apple' , 'age':42})    
+pass
 
 
 
@@ -84,8 +109,10 @@ AUTHORS_INFO = {
 
 # Use provided URLs, don't change them
 def authors(request):
-    pass
+    return render(request,"authors.html",AUTHORS_INFO)
+
 
 
 def author(request, authors_last_name):
-    pass
+    return render(request,"author.html",AUTHORS_INFO[authors_last_name])
+
